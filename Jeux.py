@@ -1,4 +1,4 @@
-import pyxel
+import pyxel, random
 
 # taille de la fenetre 128x128 pixels
 # ne pas modifier
@@ -10,6 +10,8 @@ vaisseau_x = 60
 vaisseau_y = 60
 # initialisation des tirs
 tirs_liste = []
+# initialisation des ennemis
+ennemis_liste = []
 
 def vaisseau_deplacement(x, y):
     """déplacement avec les touches de directions"""
@@ -45,10 +47,30 @@ def tirs_deplacement(tirs_liste):
         if  tir[1]<-8:
             tirs_liste.remove(tir)
     return tirs_liste
+
+def ennemis_creation(ennemis_liste):
+    """création aléatoire des ennemis"""
+
+    # un ennemi par seconde
+    if (pyxel.frame_count % 30 == 0):
+        ennemis_liste.append([random.randint(0, 120), 0])
+    return ennemis_liste
+
+
+def ennemis_deplacement(ennemis_liste):
+    """déplacement des ennemis vers le haut et suppression s'ils sortent du cadre"""
+
+    for ennemi in ennemis_liste:
+        ennemi[1] += 1
+        if  ennemi[1]>128:
+            ennemis_liste.remove(ennemi)
+    return ennemis_liste
+
+
 def update():
     """mise à jour des variables (30 fois par seconde)"""
 
-    global vaisseau_x, vaisseau_y, tirs_liste
+    global vaisseau_x, vaisseau_y, tirs_liste, ennemis_liste
 
     # mise à jour de la position du vaisseau
     vaisseau_x, vaisseau_y = vaisseau_deplacement(vaisseau_x, vaisseau_y)
@@ -58,6 +80,12 @@ def update():
 
     # mise a jour des positions des tirs
     tirs_liste = tirs_deplacement(tirs_liste)
+    
+    # creation des ennemis
+    ennemis_liste = ennemis_creation(ennemis_liste)
+
+    # mise a jour des positions des ennemis
+    ennemis_liste = ennemis_deplacement(ennemis_liste)   
 
 def draw():
     """création des objets (30 fois par seconde)"""
@@ -70,6 +98,11 @@ def draw():
         pyxel.rect(tir[0], tir[1], 1, 4, 5)
     # vaisseau (carre 8x8)
     pyxel.rect(vaisseau_x, vaisseau_y, 8, 8, 3)
+    
+     # ennemis
+    for ennemi in ennemis_liste:
+        pyxel.rect(ennemi[0], ennemi[1], 8, 8, 8)        
+
 
 
 pyxel.run(update, draw)
